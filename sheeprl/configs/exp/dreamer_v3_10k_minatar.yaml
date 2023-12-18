@@ -1,0 +1,50 @@
+# @package _global_
+
+defaults:
+  - dreamer_v3
+  - override /env: minatar
+  - _self_
+
+# Experiment
+seed: 5
+
+# Environment
+env:
+  num_envs: 1
+  max_episode_steps: 100
+  id: Breakout-v1
+  wrapper:
+    from_vectors: True
+    from_pixels: True
+
+# Checkpoint
+checkpoint:
+  every: 1000
+
+# Metric
+metric:
+  log_every: 500
+
+# Buffer
+buffer:
+  size: 1000
+  checkpoint: True
+
+# Algorithm
+algo:
+  mlp_layers: 1
+  train_every: 1
+  dense_units: 64
+  total_steps: 10000
+  learning_starts: 256
+  world_model:
+    discrete_size: 8
+    stochastic_size: 8
+    encoder:
+      cnn_channels_multiplier: 2
+    recurrent_model:
+      recurrent_state_size: 32
+    transition_model:
+      hidden_size: 32
+    representation_model:
+      hidden_size: 32
