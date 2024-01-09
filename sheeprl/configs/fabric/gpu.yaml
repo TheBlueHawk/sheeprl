@@ -1,0 +1,6 @@
+defaults:
+  - default
+  - _self_
+
+devices: [0]
+accelerator: "gpu"
