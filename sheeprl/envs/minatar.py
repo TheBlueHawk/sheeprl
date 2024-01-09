@@ -9,7 +9,11 @@ class MinAtarWrapper(gym.Wrapper):
             use_minimal_action_set=use_minimal_action_set,
         )
         super().__init__(self.env)
-        self._metadata = {"render_fps": 30}
+        FPS = 30
+        self._metadata = {"render_fps": FPS}
+        self.metadata = {"render_fps": FPS}
+        self.frames_per_sec = FPS
+        self.render_fps = FPS
 
     def reset(self, seed=None, options=None):
         self.env.reset(seed=seed, options=options)

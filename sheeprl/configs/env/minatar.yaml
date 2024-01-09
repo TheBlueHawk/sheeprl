@@ -5,7 +5,7 @@ defaults:
 # Override from `default` config
 id: Breakout-v1
 action_repeat: 1
-capture_video: False
+capture_video: True
 screen_size: 8
 
 # Wrapper to be instantiated

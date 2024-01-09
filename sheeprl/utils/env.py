@@ -16,6 +16,7 @@ from sheeprl.envs.wrappers import (
 )
 from sheeprl.utils.imports import _IS_DIAMBRA_ARENA_AVAILABLE, _IS_DIAMBRA_AVAILABLE, _IS_DMC_AVAILABLE
 
+
 if _IS_DIAMBRA_ARENA_AVAILABLE and _IS_DIAMBRA_AVAILABLE:
     from sheeprl.envs.diambra import DiambraWrapper
 if _IS_DMC_AVAILABLE:
@@ -69,7 +70,10 @@ def make_env(
             instantiate_kwargs["seed"] = seed
         if "rank" in cfg.env.wrapper:
             instantiate_kwargs["rank"] = rank + vector_env_idx
+        # Access the _target_ value
+        print(cfg.env.wrapper.env._target_)  # Prints: gymnasium.make
         env = hydra.utils.instantiate(cfg.env.wrapper, **instantiate_kwargs, _convert_="all")
+        print("ALIVE")
 
         # action repeat
         if (
