@@ -171,3 +171,5 @@ pytest_*
 mlruns
 mlartifacts
 examples/models
+session_*
+bin/

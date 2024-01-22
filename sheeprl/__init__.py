@@ -1,11 +1,11 @@
 import os
 
-ROOT_DIR = os.path.dirname(__file__)
-
 import decorator
 from dotenv import load_dotenv
 
 load_dotenv()
+ROOT_DIR = os.path.dirname(__file__)
+
 
 from sheeprl.utils.imports import _IS_TORCH_GREATER_EQUAL_2_0
 
@@ -15,6 +15,7 @@ if not _IS_TORCH_GREATER_EQUAL_2_0:
 import numpy as np
 
 # fmt: off
+from sheeprl.algos.a2c import a2c  # noqa: F401
 from sheeprl.algos.dreamer_v1 import dreamer_v1  # noqa: F401
 from sheeprl.algos.dreamer_v2 import dreamer_v2  # noqa: F401
 from sheeprl.algos.dreamer_v3 import dreamer_v3  # noqa: F401
@@ -32,6 +33,7 @@ from sheeprl.algos.sac import sac  # noqa: F401
 from sheeprl.algos.sac import sac_decoupled  # noqa: F401
 from sheeprl.algos.sac_ae import sac_ae  # noqa: F401
 
+from sheeprl.algos.a2c import evaluate as a2c_evaluate  # noqa: F401, isort:skip
 from sheeprl.algos.dreamer_v1 import evaluate as dreamer_v1_evaluate  # noqa: F401, isort:skip
 from sheeprl.algos.dreamer_v2 import evaluate as dreamer_v2_evaluate  # noqa: F401, isort:skip
 from sheeprl.algos.dreamer_v3 import evaluate as dreamer_v3_evaluate  # noqa: F401, isort:skip
@@ -50,7 +52,7 @@ np.float = np.float32
 np.int = np.int64
 np.bool = bool
 
-__version__ = "0.4.9"
+__version__ = "0.5.2"
 
 
 # Replace `moviepy.decorators.use_clip_fps_by_default` method to work with python 3.8, 3.9, and 3.10

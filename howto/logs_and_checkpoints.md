@@ -67,7 +67,7 @@ sub_dir: null
 ```
 As shown in the configurations, it is necessary to specify the `_target_` class to instantiate. For the Tensorboard logger, it is necessary to specify the `name` and the `root_dir` arguments equal to the `run_name` and `logs/runs/<root_dir>` parameters, respectively, because we want that all the logs and files (configs, checkpoint, videos, ...) are under the same folder for a specific experiment.
 
-> **Note**
+> [!NOTE]
 >
 > In general we want the path of the logs files to be in the same folder created by Hydra when the experiment is launched, so make sure to properly define the `root_dir` and `name` parameters of the logger so that it is within the folder created by hydra (defined by the `hydra.run.dir` parameter). The tensorboard logger will save the logs in the `<root_dir>/<name>/<version>/<sub_dir>/` folder (if `sub_dir` is defined, otherwise in the `<root_dir>/<name>/<version>/` folder).
 
@@ -100,7 +100,7 @@ You can specify the MLFlow logger instead of the Tensorboard one in the CLI, by 
 python sheeprl.py exp=ppo exp_name=ppo-cartpole logger@metric.logger=mlflow
 ```
 
-> **Note**
+> [!NOTE]
 >
 > If you are using an MLFlow server, you can specify the `tracking_uri` in the config file or with the `MLFLOW_TRACKING_URI` environment variable (that is the default value in the configs).
 
@@ -169,6 +169,7 @@ By default the checkpointing is enabled with the following settings:
 every: 100
 resume_from: null
 save_last: True
+keep_last: 5
 ```
 
 meaning that:
@@ -176,7 +177,8 @@ meaning that:
 * `every` is the number of policy steps (number of steps played in the environment, e.g. if one has 2 processes with 4 environments per process then the policy steps are 2*4=8) between two consecutive checkpointing operations. For more info about the policy steps, check the [Work with Steps Tutorial](./work_with_steps.md).
 * `resume_from` is the path of the checkpoint to resume from. If `null`, then the checkpointing is not resumed.
 * `save_last` is a boolean flag that enables/disables the saving of the last checkpoint.
+* `keep_last` is the number of checkpoints you want to keep during the experiment. If `null`, all the checkpoints are kept.
 
-> **Note**
+> [!NOTE]
 >
 > When restarting an experiment from a specific checkpoint (`resume_from=/path/to/checkpoint.ckpt`), it is **mandatory** to pass as arguments the same configurations of the experiment you want to restart. This is due to the way Hydra creates the folder in which it saves configs: if you do not pass the same configurations, you may have an unexpected log directory (i.e., the folder is created in the wrong folder).
