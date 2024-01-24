@@ -71,7 +71,6 @@ def make_env(
         if "rank" in cfg.env.wrapper:
             instantiate_kwargs["rank"] = rank + vector_env_idx
         # Access the _target_ value
-        print(cfg.env.wrapper.env._target_)  # Prints: gymnasium.make
         env = hydra.utils.instantiate(cfg.env.wrapper, **instantiate_kwargs, _convert_="all")
         print("ALIVE")
 

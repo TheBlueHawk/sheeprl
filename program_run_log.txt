@@ -21,3 +21,35 @@ Start Time: Mon Jan 22 10:15:16 CET 2024
 End Time: Mon Jan 22 10:15:18 CET 2024
 Elapsed Time: 2 seconds \n
 
+Command: python sheeprl.py exp=dreamer_v3_100k_ms_pacman fabric=gpu fabric.devices=[0] algo.train_every=64
+Start Time: Mon Jan 22 10:12:58 CET 2024
+End Time: Mon Jan 22 10:51:20 CET 2024
+Elapsed Time: 2302 seconds \n
+
+
+
+Command: python sheeprl.py exp=dreamer_v3_100k_ms_pacman fabric=gpu fabric.devices=[1] algo.train_every=16 algo.per_rank_batch_size=32
+Start Time: Mon Jan 22 11:17:17 CET 2024
+End Time: Mon Jan 22 14:07:13 CET 2024
+Elapsed Time: 10196 seconds \n
+
+Command: python sheeprl.py exp=dreamer_v3_100k_ms_pacman fabric=gpu fabric.devices=[0] algo.train_every=8 algo.per_rank_batch_size=16
+Start Time: Mon Jan 22 12:16:31 CET 2024
+End Time: Mon Jan 22 15:34:19 CET 2024
+Elapsed Time: 11868 seconds \n
+
+Command: python sheeprl.py exp=dreamer_v3_XS_100k_ms_pacman fabric=gpu fabric.devices=[0] algo.train_every=16 algo.per_rank_batch_size=16
+Start Time: Mon Jan 22 15:51:16 CET 2024
+End Time: Mon Jan 22 17:26:38 CET 2024
+Elapsed Time: 5721 seconds \n
+
+Command: python sheeprl.py exp=dreamer_v3_XS_100k_ms_pacman fabric=gpu fabric.devices=[1] algo.train_every=8 algo.per_rank_batch_size=16
+Start Time: Mon Jan 22 14:25:41 CET 2024
+End Time: Mon Jan 22 17:26:51 CET 2024
+Elapsed Time: 10870 seconds \n
+
+Command: python sheeprl.py exp=dreamer_v3_100k_ms_pacman fabric=gpu fabric.devices=[3] algo.train_every=8 algo.per_rank_batch_size=32
+Start Time: Mon Jan 22 12:16:43 CET 2024
+End Time: Mon Jan 22 17:34:06 CET 2024
+Elapsed Time: 19043 seconds \n
+
