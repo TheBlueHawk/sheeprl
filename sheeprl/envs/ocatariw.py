@@ -11,21 +11,27 @@ class OCAtariWrapper(gym.Wrapper):
     If an object is not detected its information entries are set to 0.
     """
 
-    def __init__(self, id: str) -> None:
-        self.ocatari_env = OCAtari(env_name=id, mode="vision", hud=True, render_mode="rgb_array")
+    def __init__(self, id: str, obs_mode:str, render_mode:str) -> None:
+        self.ocatari_env = OCAtari(env_name=id, mode="vision", hud=True, obs_mode=obs_mode, render_mode=render_mode)
         super().__init__(self.ocatari_env)
         self.reference_list = self._init_ref_vector()
         self.current_vector = np.zeros(4 * len(self.reference_list), dtype=np.float32)
-
+        self.obs_mode = obs_mode
 
     @property
     def observation_space(self):
         # fix to include pixel observations
         vl = len(self.reference_list) * 4
-        return spaces.Dict({
-            "rgb": spaces.Box(0, 255, (3, 64, 64), np.uint8),
-            "objects_position": spaces.Box(low=-(2**63), high=2**63 - 2, shape=(vl,), dtype=np.float32)
-        })
+        if self.obs_mode == "dqn":
+            return spaces.Dict({
+                "rgb": spaces.Box(0, 255, (3, 64, 64), np.uint8),
+                "objects_position": spaces.Box(low=-(2**63), high=2**63 - 2, shape=(vl,), dtype=np.float32)
+            })
+        elif self.obs_mode == "ori":
+            return spaces.Dict({
+                "rgb": self.ocatari_env.observation_space,
+                "objects_position": spaces.Box(low=-(2**63), high=2**63 - 2, shape=(vl,), dtype=np.float32)
+            })
 
     @property
     def action_space(self):

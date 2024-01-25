@@ -9,11 +9,14 @@ max_episode_steps: 27000
 
 # Wrapper to be instantiated
 wrapper:
-  _target_: gymnasium.wrappers.AtariPreprocessing # https://gymnasium.farama.org/api/wrappers/misc_wrappers/#gymnasium.wrappers.AtariPreprocessing
+  #_target_: gymnasium.wrappers.AtariPreprocessing # https://gymnasium.farama.org/api/wrappers/misc_wrappers/#gymnasium.wrappers.AtariPreprocessing
+  _target_: sheeprl.envs.custom_atari_preprocessing.CustomAtariPreprocessing 
   env:
-    _target_: gymnasium.make
+    #_target_: gymnasium.make
+    _target_: sheeprl.envs.ocatariw.OCAtariWrapper
     id: ${env.id}
     render_mode: rgb_array
+    obs_mode: ori
   noop_max: 30
   terminal_on_life_loss: False
   frame_skip: ${env.action_repeat}
