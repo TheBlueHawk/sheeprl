@@ -241,5 +241,5 @@ class CustomAtariPreprocessing(gym.Wrapper, gym.utils.RecordConstructorArgs):
         elif isinstance(self.observation_space, gym.spaces.Dict):
             return {
                 "rgb": obs,
-                "objects_position": self.env.unwrapped.observation_space["objects_position"]
+                "objects_position": self.env.current_vector
             }
