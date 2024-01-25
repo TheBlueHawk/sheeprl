@@ -2,5 +2,5 @@ defaults:
   - default
   - _self_
 
-devices: [3]
+devices: [0]
 accelerator: "gpu"

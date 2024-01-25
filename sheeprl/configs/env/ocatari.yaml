@@ -4,14 +4,15 @@ defaults:
 
 # Override from `default` config
 action_repeat: 4
-id: PongNoFrameskip-v4
+id: MsPacmanNoFrameskip-v4
 max_episode_steps: 27000
 
 # Wrapper to be instantiated
 wrapper:
   _target_: sheeprl.envs.custom_atari_preprocessing.CustomAtariPreprocessing 
   env:
-    _target_: gymnasium.make
+    _target_: sheeprl.envs.ocatari.OCAtariWrapper
+    obs_mode: ori
     id: ${env.id}
     render_mode: rgb_array
   noop_max: 30

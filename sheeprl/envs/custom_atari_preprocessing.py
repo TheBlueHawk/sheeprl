@@ -156,12 +156,10 @@ class CustomAtariPreprocessing(gym.Wrapper, gym.utils.RecordConstructorArgs):
     @property
     def ale(self):
         """Make ale as a class property to avoid serialization error."""
-        print("ale called")
         return self.env.unwrapped.ale
 
     def step(self, action):
         """Applies the preprocessing for an :meth:`env.step`."""
-        print("step called")
         total_reward, terminated, truncated, info = 0.0, False, False, {}
 
         for t in range(self.frame_skip):
@@ -187,13 +185,11 @@ class CustomAtariPreprocessing(gym.Wrapper, gym.utils.RecordConstructorArgs):
                     self.ale.getScreenGrayscale(self.obs_buffer[0])
                 else:
                     self.ale.getScreenRGB(self.obs_buffer[0])
-        print("step done")
         return self._get_obs(), total_reward, terminated, truncated, info
 
     def reset(self, **kwargs):
         """Resets the environment using preprocessing."""
         # NoopReset
-        print("reset called")
         _, reset_info = self.env.reset(**kwargs)
 
         noops = (
@@ -213,11 +209,9 @@ class CustomAtariPreprocessing(gym.Wrapper, gym.utils.RecordConstructorArgs):
         else:
             self.ale.getScreenRGB(self.obs_buffer[0])
         self.obs_buffer[1].fill(0)
-        print("reset done")
         return self._get_obs(), reset_info
 
     def _get_obs(self):
-        print("get obs called")
         if self.frame_skip > 1:  # more efficient in-place pooling
             np.maximum(self.obs_buffer[0], self.obs_buffer[1], out=self.obs_buffer[0])
         assert cv2 is not None
@@ -234,8 +228,6 @@ class CustomAtariPreprocessing(gym.Wrapper, gym.utils.RecordConstructorArgs):
 
         if self.grayscale_obs and self.grayscale_newaxis:
             obs = np.expand_dims(obs, axis=-1)  # Add a channel axis
-        #print(type(obs), obs.shape)
-        print("get obs done")
         if isinstance(self.observation_space, Box):
             return obs
         elif isinstance(self.observation_space, gym.spaces.Dict):

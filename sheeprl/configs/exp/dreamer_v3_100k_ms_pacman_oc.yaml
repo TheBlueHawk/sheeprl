@@ -2,7 +2,7 @@
 
 defaults:
   - dreamer_v3
-  - override /env: ocatariw
+  - override /env: ocatari
   - _self_
 
 # Experiment
@@ -25,9 +25,15 @@ buffer:
 
 # Algorithm
 algo:
+  cnn_keys:
+    encoder:
+      - rgb
+  # mlp_keys:
+  #   encoder: 
+  #     - objects_position
   learning_starts: 1024
   total_steps: 100000
-  train_every: 1
+  train_every: 8
   dense_units: 512
   mlp_layers: 2
   world_model:
