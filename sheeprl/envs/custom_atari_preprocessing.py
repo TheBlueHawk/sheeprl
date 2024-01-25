@@ -128,6 +128,7 @@ class CustomAtariPreprocessing(gym.Wrapper, gym.utils.RecordConstructorArgs):
             )
         else:
             # Dict space with keys rgb and objects_position
+            # TODO add buffer for objects_position??
             if grayscale_obs:
                 self.obs_buffer = [
                     np.empty(env.observation_space["rgb"].shape[:2], dtype=np.uint8),
@@ -233,6 +234,12 @@ class CustomAtariPreprocessing(gym.Wrapper, gym.utils.RecordConstructorArgs):
 
         if self.grayscale_obs and self.grayscale_newaxis:
             obs = np.expand_dims(obs, axis=-1)  # Add a channel axis
+        #print(type(obs), obs.shape)
         print("get obs done")
-        print(type(obs), obs.shape)
-        return obs
+        if isinstance(self.observation_space, Box):
+            return obs
+        elif isinstance(self.observation_space, gym.spaces.Dict):
+            return {
+                "rgb": obs,
+                "objects_position": self.env.unwrapped.observation_space["objects_position"]
+            }
