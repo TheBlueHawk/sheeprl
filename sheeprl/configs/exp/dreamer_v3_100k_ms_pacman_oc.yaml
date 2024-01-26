@@ -8,6 +8,11 @@ defaults:
 # Experiment
 seed: 5
 
+# Fabric
+fabric:
+  accelerator: gpu
+  devices: [0]
+
 # Environment
 env:
   num_envs: 1
@@ -28,9 +33,9 @@ algo:
   cnn_keys:
     encoder:
       - rgb
-  # mlp_keys:
-  #   encoder: 
-  #     - objects_position
+  mlp_keys:
+    encoder: 
+      - objects_position
   learning_starts: 1024
   total_steps: 100000
   train_every: 8

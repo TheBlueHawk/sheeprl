@@ -12,7 +12,6 @@ wrapper:
   _target_: sheeprl.envs.custom_atari_preprocessing.CustomAtariPreprocessing 
   env:
     _target_: sheeprl.envs.ocatari.OCAtariWrapper
-    obs_mode: ori
     id: ${env.id}
     render_mode: rgb_array
   noop_max: 30
