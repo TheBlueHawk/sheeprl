@@ -33,8 +33,12 @@ algo:
   cnn_keys:
     encoder:
       - rgb
+    decoder:
+      - rgb
   mlp_keys:
     encoder: 
+      - objects_position
+    decoder:
       - objects_position
   learning_starts: 1024
   total_steps: 100000
