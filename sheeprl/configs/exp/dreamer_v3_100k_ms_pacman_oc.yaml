@@ -19,10 +19,6 @@ env:
   max_episode_steps: 27000
   id: MsPacmanNoFrameskip-v4
 
-# Checkpoint
-checkpoint:
-  every: 2000
-
 # Buffer
 buffer:
   size: 100000
