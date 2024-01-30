@@ -1,0 +1,13 @@
+name: sheep
+channels:
+  - defaults
+dependencies:
+  - python=3.10
+  - pytorch
+  - torchvision
+  - cudatoolkit=11.3
+  - torchaudio
+  - pytorch-cuda=11.8
+  - chardet
+  - ipykernel
+  - tensorboard
