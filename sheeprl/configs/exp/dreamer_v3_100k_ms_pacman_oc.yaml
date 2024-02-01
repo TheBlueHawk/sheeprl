@@ -34,7 +34,7 @@ algo:
   mlp_keys:
     encoder: 
       - objects_position
-    decoder:
+    decoder: 
       - objects_position
   learning_starts: 1024
   total_steps: 100000
