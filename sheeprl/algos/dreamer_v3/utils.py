@@ -34,6 +34,8 @@ AGGREGATOR_KEYS = {
     "Grads/world_model",
     "Grads/actor",
     "Grads/critic",
+    "Loss/observation_loss_rgb",
+    "Loss/observation_loss_objects_position",
 }
 MODELS_TO_REGISTER = {"world_model", "actor", "critic", "target_critic", "moments"}
 

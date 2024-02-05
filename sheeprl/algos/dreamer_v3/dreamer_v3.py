@@ -158,7 +158,7 @@ def train(
 
     # World model optimization step. Eq. 4 in the paper
     world_optimizer.zero_grad(set_to_none=True)
-    rec_loss, kl, state_loss, reward_loss, observation_loss, continue_loss = reconstruction_loss(
+    rec_loss, kl, state_loss, reward_loss, observation_loss, continue_loss, observation_losses_dict = reconstruction_loss(
         po,
         batch_obs,
         pr,
@@ -317,6 +317,8 @@ def train(
     if aggregator and not aggregator.disabled:
         aggregator.update("Loss/world_model_loss", rec_loss.detach())
         aggregator.update("Loss/observation_loss", observation_loss.detach())
+        for obs_key, obs_loss in observation_losses_dict.items():
+            aggregator.update(f"Loss/observation_loss_{obs_key}", obs_loss.detach())
         aggregator.update("Loss/reward_loss", reward_loss.detach())
         aggregator.update("Loss/state_loss", state_loss.detach())
         aggregator.update("Loss/continue_loss", continue_loss.detach())

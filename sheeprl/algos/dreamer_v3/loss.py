@@ -63,6 +63,7 @@ def reconstruction_loss(
         reconstruction_loss (Tensor): the value of the overall reconstruction loss.
     """
     rewards.device
+    observation_losses_dict = {k: -po[k].log_prob(observations[k]).mean() for k in po.keys()}
     observation_loss = -sum([po[k].log_prob(observations[k]) for k in po.keys()])
     reward_loss = -pr.log_prob(rewards)
     # KL balancing
@@ -108,4 +109,5 @@ def reconstruction_loss(
         reward_loss.mean(),
         observation_loss.mean(),
         continue_loss.mean(),
+        observation_losses_dict,
     )
