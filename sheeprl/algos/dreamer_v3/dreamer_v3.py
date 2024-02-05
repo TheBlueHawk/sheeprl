@@ -97,7 +97,7 @@ def train(
     discrete_size = cfg.algo.world_model.discrete_size
     device = fabric.device
     batch_obs = {k: data[k] / 255.0 for k in cfg.algo.cnn_keys.encoder}
-    batch_obs.update({k: data[k] for k in cfg.algo.mlp_keys.encoder})
+    batch_obs.update({k: data[k] / 255.0 for k in cfg.algo.mlp_keys.encoder})
     data["is_first"][0, :] = torch.ones_like(data["is_first"][0, :])
 
     # Given how the environment interaction works, we remove the last actions
