@@ -4,6 +4,8 @@ from ocatari.core import OCAtari
 from gymnasium import spaces
 
 
+OBJ_SIZE = 2
+
 class OCAtariWrapper(gym.Wrapper):
     """OCAtari Environment that behaves like a gymnasium environment and passes env_check. Based on RAM, the observation space is object-centric.
     More specifically it is a list position history informations of objects detected.
@@ -12,15 +14,22 @@ class OCAtariWrapper(gym.Wrapper):
     """
 
     def __init__(self, id: str, render_mode:str) -> None:
-        self.ocatari_env = OCAtari(env_name=id, mode="revised", hud=True, obs_mode="ori", render_mode=render_mode)
+        # Assault works if hud is False, but not if it is True
+        # Assault list of objects with hud True only has hud objects no game objects
+        # workaround: set hud based on game name
+        if id == "AssaultNoFrameskip-v4":
+            hud = False
+        else:
+            hud = True
+        self.ocatari_env = OCAtari(env_name=id, mode="revised", hud=hud, obs_mode="ori", render_mode=render_mode)
         super().__init__(self.ocatari_env)
         self.reference_list = self._init_ref_vector()
-        self.current_vector = np.zeros(4 * len(self.reference_list), dtype=np.uint8)
+        self.current_vector = np.zeros(OBJ_SIZE * len(self.reference_list), dtype=np.uint8)
 
     @property
     def observation_space(self):
         # fix to include pixel observations
-        vl = len(self.reference_list) * 4
+        vl = len(self.reference_list) * OBJ_SIZE
         return spaces.Dict({
             "rgb": self.ocatari_env.observation_space,
             "objects_position": spaces.Box(low=0, high=255, shape=(vl,), dtype=np.uint8)
@@ -70,10 +79,10 @@ class OCAtariWrapper(gym.Wrapper):
             if o.category not in temp_ref_list:
                 continue
             idx = temp_ref_list.index(o.category)  # at position of first category occurance
-            start = idx * 4
-            flat = [item for sublist in o.h_coords for item in sublist]
-            self.current_vector[start : start + 4] = flat  # write the slice
+            start = idx * OBJ_SIZE
+            flat = [item for item in o.xy]
+            self.current_vector[start : start + OBJ_SIZE] = flat  # write the slice
             temp_ref_list[idx] = ""  # remove reference from reference list
         for i, d in enumerate(temp_ref_list):
             if d != "":  # fill not populated category instances wiht 0's
-                self.current_vector[i * 4 : i * 4 + 4] = [0, 0, 0, 0]
+                self.current_vector[i * OBJ_SIZE : i * OBJ_SIZE + OBJ_SIZE] = [0]*OBJ_SIZE
