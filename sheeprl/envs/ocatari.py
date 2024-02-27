@@ -62,8 +62,6 @@ class OCAtariWrapper(gym.Wrapper):
         self._obj2vec()
         obj = self.current_vector
 
-        # TODO        
-        print(obj)
         if self.perturbation == Perturbation.NONE:
             pass
         elif self.perturbation == Perturbation.NOISE:
@@ -92,7 +90,6 @@ class OCAtariWrapper(gym.Wrapper):
         else:
             raise ValueError(f"Invalid perturbation {self.perturbation}\n Choose 0 for no perturbation, 1 for noise, 2 for occlusion, 3 for false positive.")
 
-        print(obj)
         return {
             "rgb": rgb_obs,
             "objects_position": obj
