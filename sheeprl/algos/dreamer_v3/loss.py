@@ -19,6 +19,7 @@ def reconstruction_loss(
     kl_representation: float = 0.1,
     kl_free_nats: float = 1.0,
     kl_regularizer: float = 1.0,
+    obs_loss_regularizer: float = 1.0,
     pc: Optional[Distribution] = None,
     continue_targets: Optional[Tensor] = None,
     continue_scale_factor: float = 1.0,
@@ -43,6 +44,7 @@ def reconstruction_loss(
             Default to 1.0.
         kl_regularizer (float): scale factor of the KL divergence.
             Default to 1.0.
+        obs_loss_regularizer (float): scale factor of object observation loss.
         pc (Bernoulli, optional): the predicted Bernoulli distribution of the terminal steps.
             0s for the entries that are relative to a terminal step, 1s otherwise.
             Default to None.
@@ -63,8 +65,17 @@ def reconstruction_loss(
         reconstruction_loss (Tensor): the value of the overall reconstruction loss.
     """
     rewards.device
-    observation_losses_dict = {k: -po[k].log_prob(observations[k]).mean() for k in po.keys()}
-    observation_loss = -sum([po[k].log_prob(observations[k]) for k in po.keys()])
+    # obs loss weights: 1.0 for all except objects_position which is obs_loss_regularizer
+    obs_loss_weights = {k: 1.0 for k in po.keys()}
+    if "objects_position" in obs_loss_weights:
+        obs_loss_weights["objects_position"] = obs_loss_regularizer
+    # observation losses
+    observation_losses_dict = {k: -po[k].log_prob(observations[k]) * obs_loss_weights[k] for k in po.keys()}
+    # total observation loss
+    observation_loss = sum([observation_losses_dict[k] for k in po.keys()])
+    # mean observation losses
+    observation_mean_losses_dict = {k: v.mean() for k, v in observation_losses_dict.items()}
+
     reward_loss = -pr.log_prob(rewards)
     # KL balancing
     dyn_loss = kl = kl_divergence(
@@ -109,5 +120,5 @@ def reconstruction_loss(
         reward_loss.mean(),
         observation_loss.mean(),
         continue_loss.mean(),
-        observation_losses_dict,
+        observation_mean_losses_dict,
     )

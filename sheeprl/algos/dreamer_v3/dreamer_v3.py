@@ -169,6 +169,7 @@ def train(
         cfg.algo.world_model.kl_representation,
         cfg.algo.world_model.kl_free_nats,
         cfg.algo.world_model.kl_regularizer,
+        cfg.algo.world_model.obs_loss_regularizer,
         pc,
         continue_targets,
         cfg.algo.world_model.continue_scale_factor,
