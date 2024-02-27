@@ -5,6 +5,14 @@ from gymnasium import spaces
 
 
 OBJ_SIZE = 2
+NOISE_SCALE = 4
+# ENUM perturbation cateogry
+class Perturbation:
+    NONE = 0
+    NOISE = 1
+    OCCLUSION = 2
+    FALSE_POSITIVE = 3
+
 
 class OCAtariWrapper(gym.Wrapper):
     """OCAtari Environment that behaves like a gymnasium environment and passes env_check. Based on RAM, the observation space is object-centric.
@@ -13,7 +21,7 @@ class OCAtariWrapper(gym.Wrapper):
     If an object is not detected its information entries are set to 0.
     """
 
-    def __init__(self, id: str, render_mode:str) -> None:
+    def __init__(self, id: str, render_mode:str, perturbation=Perturbation.NONE) -> None:
         # Assault works if hud is False, but not if it is True
         # Assault list of objects with hud True only has hud objects no game objects
         # workaround: set hud based on game name
@@ -25,6 +33,7 @@ class OCAtariWrapper(gym.Wrapper):
         super().__init__(self.ocatari_env)
         self.reference_list = self._init_ref_vector()
         self.current_vector = np.zeros(OBJ_SIZE * len(self.reference_list), dtype=np.uint8)
+        self.perturbation = perturbation
 
     @property
     def observation_space(self):
@@ -51,9 +60,42 @@ class OCAtariWrapper(gym.Wrapper):
     
     def _convert_obs(self, rgb_obs):
         self._obj2vec()
+        obj = self.current_vector
+
+        # TODO        
+        print(obj)
+        if self.perturbation == Perturbation.NONE:
+            pass
+        elif self.perturbation == Perturbation.NOISE:
+            # add noise to the object position
+            noise = np.random.normal(0, NOISE_SCALE, obj.shape)
+            noise = np.where(obj == 0, 0, noise)
+            # add noise cast to int only to the non-zero element of obj
+            obj = [o + n for o, n in zip(obj, noise)]
+            # clip the values to be in the range [0, 255]
+            obj = np.clip(obj, 0, 255) 
+            # back to uint8
+            obj = np.array(obj, dtype=np.uint8)
+        elif self.perturbation == Perturbation.OCCLUSION:
+            # zero out the object position of a few objects
+            num_occlusions = np.random.randint(0, len(obj) // (OBJ_SIZE*2))
+            occluded_indices = np.random.choice(len(obj) // OBJ_SIZE, num_occlusions, replace=False)
+            for i in occluded_indices:
+                obj[i * OBJ_SIZE : i * OBJ_SIZE + OBJ_SIZE] = 0
+        elif self.perturbation == Perturbation.FALSE_POSITIVE:
+            # add a false positive object: look for two consecutive 0's and replace them with a random object position
+            for i in range(len(obj) - 1):
+                if obj[i] == 0 and obj[i + 1] == 0 and i % 2 == 0:
+                    obj[i] = np.random.randint(0, 255)
+                    obj[i + 1] = np.random.randint(0, 255)
+                    break
+        else:
+            raise ValueError(f"Invalid perturbation {self.perturbation}\n Choose 0 for no perturbation, 1 for noise, 2 for occlusion, 3 for false positive.")
+
+        print(obj)
         return {
             "rgb": rgb_obs,
-            "objects_position": self.current_vector
+            "objects_position": obj
         }
 
     def render(self, *args, **kwargs):

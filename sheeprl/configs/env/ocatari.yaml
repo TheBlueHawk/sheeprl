@@ -14,6 +14,7 @@ wrapper:
     _target_: sheeprl.envs.ocatari.OCAtariWrapper
     id: ${env.id}
     render_mode: rgb_array
+    perturbation: 0
   noop_max: 30
   terminal_on_life_loss: False
   frame_skip: ${env.action_repeat}
