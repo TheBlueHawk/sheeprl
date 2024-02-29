@@ -19,13 +19,15 @@ def create_experiment_df(tensorboard_path, config_path):
     # Extract parameters from config
     def get_ae_keys(mlp_keys: dict, cnn_keys: dict):
         if mlp_keys['encoder'] == []:
-            return 'None'
+            return 'rgb'
         elif cnn_keys['encoder'] == []:
-            return 'obj_only'
-        elif mlp_keys['decoder'] == ["objects_position"]:
-            return 'obj_autoencoding'
-        elif mlp_keys['encoder'] == ["objects_position"]:
-            return 'obj_enconding_only'
+            return 'obj'
+        elif mlp_keys['decoder'] == ["objects_position"] and cnn_keys['decoder'] == ["rgb"]:
+            return 'rgb + obj'
+        elif mlp_keys['decoder'] == ["objects_position"] and cnn_keys['decoder'] == []:
+            return 'obj + rgb_encoding_only'
+        elif mlp_keys['decoder'] == [] and cnn_keys['decoder'] == ["rgb"]:
+            return 'rgb + obj_encoding_only'
         else:
             return 'Not found'
     
@@ -36,6 +38,7 @@ def create_experiment_df(tensorboard_path, config_path):
         'train_every': config.get('algo', {}).get('train_every', 'Not found'),
         'run_name': config.get('run_name', 'Not found'),
         'buffer_size': config.get('buffer', {}).get('size', 'Not found'),
+        'obs_loss_regularizer': config.get('algo', {}).get('world_model', {}).get('obs_loss_regularizer', 1),
     }
     # Extract metrics and populate DataFrame
     list_of_entries = []
@@ -52,9 +55,10 @@ def create_experiment_df(tensorboard_path, config_path):
                 'AE_Keys': params['ae_keys'],
                 'Train_Every': params['train_every'],
                 'Run_ID': params['run_name'],
-                'Buffer_Size': params['buffer_size']
+                'Buffer_Size': params['buffer_size'],
+                'Obs_Loss_Regularizer': params['obs_loss_regularizer'],
             })
-    df = pd.DataFrame.from_records(list_of_entries, columns=['Metric', 'Step', 'Value', 'Seed', 'AE_Keys', 'Train_Every', 'Run_ID', 'Buffer_Size'])
+    df = pd.DataFrame.from_records(list_of_entries, columns=['Metric', 'Step', 'Value', 'Seed', 'AE_Keys', 'Train_Every', 'Run_ID', 'Buffer_Size', 'Obs_Loss_Regularizer'])
     return df
 
 
@@ -98,7 +102,8 @@ def run_tests(logs_base_dir, gpu_id=0):
                 algo_cnn_keys_encoder = config['algo']['cnn_keys']['encoder']
                 algo_cnn_keys_decoder = config['algo']['cnn_keys']['decoder']
                 algo_train_every = config['algo']['train_every']
-                print(run_name, env_id, algo_train_every, algo_mlp_encoder, algo_mlp_keys_decoder, algo_cnn_keys_encoder, algo_cnn_keys_decoder)
+                obs_loss_regularizer = config['algo']['world_model'].get('obs_loss_regularizer', 1)
+                print(run_name, env_id, algo_train_every, algo_mlp_encoder, algo_mlp_keys_decoder, algo_cnn_keys_encoder, algo_cnn_keys_decoder, obs_loss_regularizer)
                 for seed in seeds:
                     # execute python command to run the test
                     command = [
@@ -114,6 +119,7 @@ def run_tests(logs_base_dir, gpu_id=0):
                         f"algo.cnn_keys.encoder={algo_cnn_keys_encoder}",
                         f"algo.cnn_keys.decoder={algo_cnn_keys_decoder}",
                         "algo.total_steps=0",
+                        f"algo.world_model.obs_loss_regularizer={obs_loss_regularizer}",
                         f"run_name={run_name}"
                     ]
                     subprocess.run(command, check=True)
@@ -157,7 +163,7 @@ def rew_barplot(df: pd.DataFrame, env_id: str, train_every: int = 2):
     sns.set_theme(style="whitegrid")
     # Plot bar plot of Test/cumulative_reward grouped by MLP_Keys, show mean and confidence interval
     plt.figure(figsize=(10, 6))
-    filtered_df = df[(df['Metric']=='Test/cumulative_reward') & (df['Train_Every'] == train_every) & (df['Buffer_Size'] == 100000)]
+    filtered_df = df[(df['Metric']=='Test/cumulative_reward') & (df['Train_Every'] == train_every) & (df['Buffer_Size'] == 100000) & (df['Obs_Loss_Regularizer'] == 1)]
     print(filtered_df.groupby('AE_Keys')['Run_ID'].nunique())
     filtered_df = filtered_df.drop(columns=['Run_ID', 'Metric', 'Train_Every', 'Seed', 'Step'])
     sns.set_style("whitegrid")
@@ -195,10 +201,10 @@ def create_viz(df, env_id):
                 rew_barplot(df, env_id, train_every)
                 continue
             # Group by Step and Metric, then calculate mean and std
-            filtered_df = df[(df['Metric']==metric) & (df['Train_Every'] == train_every) & (df['Buffer_Size'] == 100000)]
+            filtered_df = df[(df['Metric']==metric) & (df['Train_Every'] == train_every) & (df['Buffer_Size'] == 100000) & (df['Obs_Loss_Regularizer'] == 1)]
             # get number of unique run ids by group of AE_Keys
             print(filtered_df.groupby('AE_Keys')['Run_ID'].nunique())
-            grouped = filtered_df.drop(columns=['Run_ID', 'Metric', 'Buffer_Size' 'Train_Every', 'Seed']).groupby(['Step', 'AE_Keys'])
+            grouped = filtered_df.drop(columns=['Run_ID', 'Metric', 'Buffer_Size', 'Train_Every', 'Seed']).groupby(['Step', 'AE_Keys'])
             mean_std_df = grouped['Value'].agg(['mean', 'std']).reset_index()
             # smoothing the plot
             mean_std_df['mean'] = mean_std_df['mean'].rolling(window=5).mean()
@@ -211,7 +217,7 @@ def create_viz(df, env_id):
             # Unique AE_Keys
             ae_keys_unique = filtered_df['AE_Keys'].unique()
 
-            for ae_key in ae_keys_unique:
+            for ae_key in sorted(ae_keys_unique):
                 subset = mean_std_df[mean_std_df['AE_Keys'] == ae_key]
                 
                 # Plot mean

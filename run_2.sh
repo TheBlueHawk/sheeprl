@@ -1,6 +1,9 @@
 #!/bin/bash
 
 
-# python sheeprl.py exp=dreamer_v3_100k_ms_pacman_oc fabric.devices="[2]" seed=2 algo.train_every=8 algo.cnn_keys.decoder="[]" algo.cnn_keys.encoder="[]"
-python sheeprl.py exp=dreamer_v3_100k_ms_pacman_oc fabric.devices="[2]" seed=2 algo.train_every=8 algo.mlp_keys.decoder="[]"
-python sheeprl.py exp=dreamer_v3_100k_ms_pacman_oc fabric.devices="[2]" seed=2 algo.train_every=2 buffer.size=10000
+
+for seed in 0 1
+do
+    python sheeprl.py exp=dreamer_v3_100k_ms_pacman_oc fabric.devices="[2]" seed=$seed algo.train_every=2 algo.world_model.obs_loss_regularizer=100.0
+    python sheeprl.py exp=dreamer_v3_100k_ms_pacman_oc fabric.devices="[2]" seed=$seed algo.train_every=2 algo.world_model.obs_loss_regularizer=300.0
+done
