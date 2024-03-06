@@ -1,6 +1,7 @@
 import os
 import glob
 
+NUM_EVALS = 9
 
 def main():
     print(f"Running test evals ...")
@@ -31,12 +32,12 @@ def main():
                     # crete the evaluation directory
                     os.makedirs(eval_dir)
                 # check that version_N for N = 0,1,2,3,4 exists within the evaluation dir, if not add to the list
-                for i in range(0, 5):
+                for i in range(0, NUM_EVALS):
                     version_dir = os.path.join(eval_dir, f'version_{i}')
                     if not os.path.exists(version_dir):
                         test_evals_to_run += 1
                 if test_evals_to_run == 0:
-                    print(f"Skipping {run_name} because all 5 test evals have been run")
+                    print(f"Skipping {run_name} because all {NUM_EVALS} test evals have been run")
                     continue
 
                 print(f"Running {test_evals_to_run} test evals for {checkpoint_path}")
