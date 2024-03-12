@@ -1,7 +1,7 @@
 import os
 import glob
 
-NUM_EVALS = 9
+NUM_EVALS = 19
 
 def main():
     print(f"Running test evals ...")
