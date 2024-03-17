@@ -88,6 +88,7 @@ def test(
     log_dir: str,
     test_name: str = "",
     sample_actions: bool = False,
+    train_step: int = None,
 ):
     """Test the model on the environment with the frozen model.
 
@@ -100,6 +101,7 @@ def test(
             Default to "".
         sample_actions (bool): whether or not to sample the actions.
             Default to False.
+        train_step (int): the number of steps the frozen model was trained on.
     """
     env: gym.Env = make_env(cfg, cfg.seed, 0, log_dir, "test" + (f"_{test_name}" if test_name != "" else ""))()
     done = False
@@ -134,7 +136,10 @@ def test(
         cumulative_rew += reward
     fabric.print("Test - Reward:", cumulative_rew)
     if cfg.metric.log_level > 0 and len(fabric.loggers) > 0:
-        fabric.logger.log_metrics({"Test/cumulative_reward": cumulative_rew}, 0)
+        if train_step is None:
+            fabric.logger.log_metrics({"Test/cumulative_reward": cumulative_rew}, 0)
+        else:
+            fabric.logger.log_metrics({"Train/cumulative_reward": cumulative_rew}, train_step)
     env.close()
 
 

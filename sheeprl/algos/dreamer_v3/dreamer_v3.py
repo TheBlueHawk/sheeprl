@@ -745,6 +745,11 @@ def main(fabric: Fabric, cfg: Dict[str, Any]):
                         policy_step,
                     )
                 timer.reset()
+            
+            # Test run
+            if cfg.algo.run_test:
+                test(player, fabric, cfg, log_dir, sample_actions=True, train_step=policy_step)
+            
 
             # Reset counters
             last_log = policy_step
