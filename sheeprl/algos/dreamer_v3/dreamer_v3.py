@@ -746,9 +746,9 @@ def main(fabric: Fabric, cfg: Dict[str, Any]):
                     )
                 timer.reset()
             
-            # Test run
-            if cfg.algo.run_test:
-                test(player, fabric, cfg, log_dir, sample_actions=True, train_step=policy_step)
+            # Eval run during training
+            # if cfg.algo.run_test:
+            #     test(player, fabric, cfg, log_dir, sample_actions=True, train_step=policy_step)
             
 
             # Reset counters
